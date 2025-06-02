@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ManuEstudia</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.0/mammoth.browser.min.js"></script>
+<style>
+  :root {
+    --primary: #4361ee;
+    --primary-dark: #3a0ca3;
+    --secondary: #f72585;
+    --accent: #4cc9f0;
+    --light: #f8f9fa;
+    --dark: #212529;
+    --darker: #1a1a1a;
+    --dark-gray: #2d2d2d;
+    --success: #38b000;
+    --warning: #ffaa00;
+    --danger: #ef233c;
+    --gray: #6c757d;
+    --border-radius: 12px;
+    --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--darker);
+    color: var(--light);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: white;
+    font-size: 2.5rem;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  h2 {
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 1.8rem;
+  }
+
+  /* Pestañas */
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-button {
+    padding: 1rem 2rem;
+    background: var(--dark-gray);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: var(--border-radius);
+    color: var(--light);
+    transition: var(--transition);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tab-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .tab-button.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+  }
+
+  .tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: white;
+  }
+
+  /* Contenido de pestañas */
+  .tab-content {
+    background: var(--dark-gray);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    display: none;
+    box-shadow: var(--box-shadow);
+    animation: fadeIn 0.5s ease;
+    margin-bottom: 2rem;
+    color: var(--light);
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  /* Calculadoras */
+  .calculator {
+    max-width: 500px;
+    margin: 0 auto;
+    background: var(--dark-gray);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--box-shadow);
+  }
+
+  .calculator-display {
+    width: 100%;
+    height: 80px;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    font-size: 2rem;
+    text-align: right;
+    border: 2px solid #444;
+    border-radius: var(--border-radius);
+    background: #333;
+    color: var(--light);
+    font-family: 'Roboto Mono', monospace;
+  }
+
+  .calculator-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+  }
+
+  .calculator-btn {
+    padding: 1rem;
+    font-size: 1.3rem;
+    border: none;
+    border-radius: var(--border-radius);
+    background: #444;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 500;
+    color: white;
+  }
+
+  .calculator-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .calculator-btn.operator {
+    background: var(--primary);
+    color: white;
+  }
+
+  .calculator-btn.operator:hover {
+    background: var(--primary-dark);
+  }
+
+  .calculator-btn.equals {
+    background: var(--success);
+    color: white;
+    grid-column: span 2;
+  }
+
+  .calculator-btn.clear {
+    background: var(--danger);
+    color: white;
+  }
+
+  .calculator-btn.function {
+    background: var(--warning);
+    color: white;
+  }
+
+  /* Pomodoro */
+  .pomodoro-container {
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+    background: var(--dark-gray);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--box-shadow);
+  }
+
+  .pomodoro-input {
+    margin-bottom: 1.5rem;
+  }
+
+  .pomodoro-input label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--light);
+  }
+
+  .pomodoro-input input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid #444;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background: #333;
+    color: white;
+  }
+
+  .pomodoro-input input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+  }
+
+  .timer-display {
+    font-size: 4.5rem;
+    font-weight: bold;
+    margin: 1.5rem 0;
+    color: var(--accent);
+    font-family: 'Roboto Mono', monospace;
+  }
+
+  .pomodoro-status {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--light);
+    font-weight: 500;
+  }
+
+  .pomodoro-btn {
+    padding: 0.8rem 1.8rem;
+    margin: 0 0.5rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .pomodoro-btn.start {
+    background: var(--success);
+    color: white;
+  }
+
+  .pomodoro-btn.pause {
+    background: var(--warning);
+    color: white;
+  }
+
+  .pomodoro-btn.stop {
+    background: var(--danger);
+    color: white;
+  }
+
+  .pomodoro-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .pomodoro-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Conversor */
+  .converter-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--dark-gray);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--box-shadow);
+  }
+
+  .converter-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .converter-row label {
+    flex-basis: 120px;
+    font-weight: 600;
+    color: var(--light);
+  }
+
+  .converter-row select,
+  .converter-row input {
+    flex-grow: 1;
+    padding: 0.8rem 1rem;
+    border: 2px solid #444;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background: #333;
+    color: white;
+  }
+
+  .converter-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background: var(--primary);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1.2rem;
+    color: white;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    margin-top: 1rem;
+  }
+
+  .converter-btn:hover {
+    background: var(--primary-dark);
+  }
+
+  .converter-result {
+    margin-top: 1.5rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  /* Agenda */
+  .agenda-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--dark-gray);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--box-shadow);
+  }
+
+  #agendaForm {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  #agendaTask {
+    flex-grow: 1;
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+    border-radius: var(--border-radius);
+    border: none;
+    background: #333;
+    color: white;
+  }
+
+  #agendaForm button {
+    background: var(--primary);
+    border: none;
+    padding: 0.7rem 1.2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    color: white;
+    transition: var(--transition);
+  }
+
+  #agendaForm button:hover {
+    background: var(--primary-dark);
+  }
+
+  #taskList {
+    list-style: none;
+    margin-top: 1rem;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-left: 0;
+  }
+
+  #taskList li {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    background: #2b2b2b;
+    transition: background 0.2s;
+  }
+
+  #taskList li:hover {
+    background: var(--primary);
+  }
+
+  /* PDF Resumidor */
+  .pdf-summarizer {
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--dark-gray);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--box-shadow);
+    color: var(--light);
+  }
+
+  .pdf-upload-area {
+    border: 2px dashed var(--primary);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+    position: relative;
+    color: var(--primary);
+    user-select: none;
+  }
+
+  .pdf-upload-area:hover {
+    background: rgba(67, 97, 238, 0.1);
+  }
+
+  .pdf-upload-icon {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .pdf-upload-text {
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+
+  .pdf-upload-hint {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    color: var(--gray);
+  }
+
+  .pdf-summary-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .pdf-summary-controls select {
+    padding: 0.6rem 1rem;
+    border-radius: var(--border-radius);
+    border: none;
+    font-size: 1rem;
+    background: #333;
+    color: white;
+    cursor: pointer;
+  }
+
+  .pdf-summary-controls button {
+    padding: 0.6rem 1.5rem;
+    background: var(--secondary);
+    border: none;
+    border-radius: var(--border-radius);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .pdf-summary-controls button:hover {
+    background: #c11473;
+  }
+
+  .pdf-summary-result {
+    background: #222;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    min-height: 150px;
+    white-space: pre-wrap;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* Animación fadeIn */
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
+
+  /* Scrollbar para listas */
+  #taskList::-webkit-scrollbar {
+    width: 6px;
+  }
+  #taskList::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: var(--border-radius);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .tabs {
+      flex-wrap: wrap;
+    }
+    .tab-button {
+      flex: 1 1 45%;
+    }
+    .calculator-buttons {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .converter-row {
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .converter-row label {
+      flex-basis: auto;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>ManuEstudia - Todo en Uno</h1>
+
+  <div class="tabs">
+    <button class="tab-button active" data-tab="1">Calculadora Básica</button>
+    <button class="tab-button" data-tab="2">Calculadora Científica</button>
+    <button class="tab-button" data-tab="3">Pomodoro</button>
+    <button class="tab-button" data-tab="4">Conversor</button>
+    <button class="tab-button" data-tab="5">Agenda</button>
+    <button class="tab-button" data-tab="6">Resumidor PDF</button>
+  </div>
+
+  <!-- Calculadora Básica -->
+  <div id="tab1" class="tab-content active">
+    <div class="calculator">
+      <input type="text" id="basicDisplay" class="calculator-display" readonly />
+      <div class="calculator-buttons">
+        <button class="calculator-btn" data-value="7">7</button>
+        <button class="calculator-btn" data-value="8">8</button>
+        <button class="calculator-btn" data-value="9">9</button>
+        <button class="calculator-btn operator" data-value="/">÷</button>
+
+        <button class="calculator-btn" data-value="4">4</button>
+        <button class="calculator-btn" data-value="5">5</button>
+        <button class="calculator-btn" data-value="6">6</button>
+        <button class="calculator-btn operator" data-value="*">×</button>
+
+        <button class="calculator-btn" data-value="1">1</button>
+        <button class="calculator-btn" data-value="2">2</button>
+        <button class="calculator-btn" data-value="3">3</button>
+        <button class="calculator-btn operator" data-value="-">−</button>
+
+        <button class="calculator-btn clear" data-action="clear">C</button>
+        <button class="calculator-btn" data-value="0">0</button>
+        <button class="calculator-btn equals" data-action="equals">=</button>
+        <button class="calculator-btn operator" data-value="+">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculadora Científica -->
+  <div id="tab2" class="tab-content">
+    <div class="calculator">
+      <input type="text" id="sciDisplay" class="calculator-display" readonly />
+      <div class="calculator-buttons">
+        <button class="calculator-btn" data-value="7">7</button>
+        <button class="calculator-btn" data-value="8">8</button>
+        <button class="calculator-btn" data-value="9">9</button>
+        <button class="calculator-btn operator" data-value="/">÷</button>
+
+        <button class="calculator-btn" data-value="4">4</button>
+        <button class="calculator-btn" data-value="5">5</button>
+        <button class="calculator-btn" data-value="6">6</button>
+        <button class="calculator-btn operator" data-value="*">×</button>
+
+        <button class="calculator-btn" data-value="1">1</button>
+        <button class="calculator-btn" data-value="2">2</button>
+        <button class="calculator-btn" data-value="3">3</button>
+        <button class="calculator-btn operator" data-value="-">−</button>
+
+        <button class="calculator-btn clear" data-action="clear">C</button>
+        <button class="calculator-btn" data-value="0">0</button>
+        <button class="calculator-btn equals" data-action="equals">=</button>
+        <button class="calculator-btn operator" data-value="+">+</button>
+
+        <!-- Funciones científicas -->
+        <button class="calculator-btn function" data-func="sin">sin</button>
+        <button class="calculator-btn function" data-func="cos">cos</button>
+        <button class="calculator-btn function" data-func="tan">tan</button>
+        <button class="calculator-btn function" data-func="log">log</button>
+
+        <button class="calculator-btn function" data-func="sqrt">√</button>
+        <button class="calculator-btn function" data-func="pow2">x²</button>
+        <button class="calculator-btn function" data-func="pow3">x³</button>
+        <button class="calculator-btn function" data-func="pi">π</button>
+
+        <button class="calculator-btn function" data-func="exp">eˣ</button>
+        <button class="calculator-btn function" data-func="abs">abs</button>
+        <button class="calculator-btn function" data-func="fact">n!</button>
+        <button class="calculator-btn function" data-func="neg">+/-</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pomodoro -->
+  <div id="tab3" class="tab-content">
+    <div class="pomodoro-container">
+      <h2>Pomodoro Timer</h2>
+      <div class="pomodoro-input">
+        <label for="workDuration">Duración trabajo (min):</label>
+        <input type="number" id="workDuration" value="25" min="1" max="120" />
+      </div>
+      <div class="pomodoro-input">
+        <label for="breakDuration">Duración descanso (min):</label>
+        <input type="number" id="breakDuration" value="5" min="1" max="60" />
+      </div>
+      <div class="timer-display" id="pomodoroTimer">25:00</div>
+      <div class="pomodoro-status" id="pomodoroStatus">Estado: Listo</div>
+      <div>
+        <button class="pomodoro-btn start" id="pomodoroStartBtn">Iniciar</button>
+        <button class="pomodoro-btn pause" id="pomodoroPauseBtn" disabled>Pausar</button>
+        <button class="pomodoro-btn stop" id="pomodoroStopBtn" disabled>Detener</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conversor -->
+  <div id="tab4" class="tab-content">
+    <div class="converter-container">
+      <h2>Conversor</h2>
+      <div class="converter-row">
+        <label for="conversionType">Tipo:</label>
+        <select id="conversionType">
+          <option value="length">Longitud</option>
+          <option value="weight">Peso</option>
+          <option value="temperature">Temperatura</option>
+        </select>
+      </div>
+      <div class="converter-row">
+        <label for="inputValue">Valor:</label>
+        <input type="number" id="inputValue" placeholder="Introduce valor" />
+      </div>
+      <div class="converter-row">
+        <label for="fromUnit">De:</label>
+        <select id="fromUnit"></select>
+      </div>
+      <div class="converter-row">
+        <label for="toUnit">A:</label>
+        <select id="toUnit"></select>
+      </div>
+      <button class="converter-btn" id="convertBtn">Convertir</button>
+      <div class="converter-result" id="conversionResult"></div>
+    </div>
+  </div>
+
+  <!-- Agenda -->
+  <div id="tab5" class="tab-content">
+    <div class="agenda-container">
+      <h2>Agenda - Tareas (clic para eliminar)</h2>
+      <form id="agendaForm">
+        <input type="text" id="agendaTask" placeholder="Nueva tarea" required />
+        <button type="submit">Agregar</button>
+      </form>
+      <ul id="taskList"></ul>
+    </div>
+  </div>
+
+  <!-- Resumidor PDF -->
+  <div id="tab6" class="tab-content">
+    <div class="pdf-summarizer">
+      <h2>Resumidor de PDF</h2>
+      <div class="pdf-upload-area" id="pdfUploadArea" tabindex="0" role="button" aria-label="Subir archivo PDF">
+        <input type="file" id="pdfFileInput" accept=".pdf" style="display:none" />
+        <div class="pdf-upload-icon">📄</div>
+        <div class="pdf-upload-text">Haz clic o arrastra un archivo PDF aquí</div>
+        <div class="pdf-upload-hint">Solo archivos PDF. Tamaño máximo 5MB.</div>
+      </div>
+      <div class="pdf-summary-controls">
+        <select id="summaryLength">
+          <option value="short">Resumen corto</option>
+          <option value="medium" selected>Resumen medio</option>
+          <option value="long">Resumen largo</option>
+        </select>
+        <button id="summarizeBtn">Resumir</button>
+      </div>
+      <div class="pdf-summary-result" id="pdfSummaryResult">
+        <h3>Resumen</h3>
+        <p id="summaryText">Sube un archivo y pulsa resumir.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.8.162/pdf.min.js"></script>
+<script>
+
+// ================= Tabs =================
+const tabs = document.querySelectorAll('.tab-button');
+const contents = document.querySelectorAll('.tab-content');
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const target = tab.dataset.tab;
+    contents.forEach(c => c.classList.remove('active'));
+    document.getElementById('tab' + target).classList.add('active');
+  });
+});
+
+// ================= Calculadora Básica =================
+const basicDisplay = document.getElementById('basicDisplay');
+const basicButtons = document.querySelectorAll('#tab1 .calculator-btn');
+basicButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const val = btn.dataset.value;
+    const action = btn.dataset.action;
+    if (action === 'clear') {
+      basicDisplay.value = '';
+    } else if (action === 'equals') {
+      try {
+        // Reemplaza × y ÷ con * y / para evaluación
+        const expr = basicDisplay.value.replace(/÷/g, '/').replace(/×/g, '*');
+        const result = eval(expr);
+        basicDisplay.value = result;
+      } catch {
+        basicDisplay.value = 'Error';
+      }
+    } else {
+      basicDisplay.value += val;
+    }
+  });
+});
+
+// ================= Calculadora Científica =================
+const sciDisplay = document.getElementById('sciDisplay');
+const sciButtons = document.querySelectorAll('#tab2 .calculator-btn');
+let sciExpression = '';
+sciButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const val = btn.dataset.value;
+    const func = btn.dataset.func;
+    const action = btn.dataset.action;
+
+    if (action === 'clear') {
+      sciExpression = '';
+      sciDisplay.value = '';
+    } else if (action === 'equals') {
+      try {
+        // Evaluar expresiones matemáticas usando Math y funciones definidas
+        const safeEval = (expr) => {
+          // Funciones matemáticas permitidas
+          const mathFuncs = {
+            sin: Math.sin,
+            cos: Math.cos,
+            tan: Math.tan,
+            log: Math.log10,
+            sqrt: Math.sqrt,
+            pow: Math.pow,
+            abs: Math.abs,
+            exp: Math.exp,
+            pi: Math.PI,
+            e: Math.E,
+            fact: (n) => {
+              if (n < 0) return NaN;
+              if (n === 0) return 1;
+              let f = 1;
+              for (let i = 1; i <= n; i++) f *= i;
+              return f;
+            }
+          };
+          // Reemplaza π con Math.PI y e con Math.E
+          expr = expr.replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E');
+
+          // Reemplaza factorial
+          expr = expr.replace(/(\d+)!/g, 'fact($1)');
+
+          // Reemplaza potencias al cuadrado y cubo
+          expr = expr.replace(/(\d+)\^2/g, 'Math.pow($1,2)');
+          expr = expr.replace(/(\d+)\^3/g, 'Math.pow($1,3)');
+
+          // Evalúa la expresión de manera segura
+          return Function('fact', 'Math', 'return ' + expr)(mathFuncs.fact, Math);
+        };
+
+        const result = safeEval(sciExpression);
+        sciDisplay.value = result;
+        sciExpression = result.toString();
+      } catch {
+        sciDisplay.value = 'Error';
+        sciExpression = '';
+      }
+    } else if (func) {
+      // Funciones científicas
+      if (func === 'pi') {
+        sciExpression += 'π';
+        sciDisplay.value = sciExpression;
+      } else if (func === 'pow2') {
+        sciExpression += '^2';
+        sciDisplay.value = sciExpression;
+      } else if (func === 'pow3') {
+        sciExpression += '^3';
+        sciDisplay.value = sciExpression;
+      } else if (func === 'fact') {
+        sciExpression += '!';
+        sciDisplay.value = sciExpression;
+      } else if (func === 'neg') {
+        // Negar último número
+        if (sciExpression.startsWith('-')) {
+          sciExpression = sciExpression.substring(1);
+        } else {
+          sciExpression = '-' + sciExpression;
+        }
+        sciDisplay.value = sciExpression;
+      } else {
+        sciExpression += func + '(';
+        sciDisplay.value = sciExpression;
+      }
+    } else {
+      sciExpression += val;
+      sciDisplay.value = sciExpression;
+    }
+  });
+});
+
+// ================= Pomodoro =================
+const pomodoroTimer = document.getElementById('pomodoroTimer');
+const pomodoroStatus = document.getElementById('pomodoroStatus');
+const workInput = document.getElementById('workDuration');
+const breakInput = document.getElementById('breakDuration');
+const startBtn = document.getElementById('pomodoroStartBtn');
+const pauseBtn = document.getElementById('pomodoroPauseBtn');
+const stopBtn = document.getElementById('pomodoroStopBtn');
+
+let pomodoroInterval = null;
+let isRunning = false;
+let isWorkTime = true;
+let timeLeft = 0;
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+  const seconds = (timeLeft % 60).toString().padStart(2, '0');
+  pomodoroTimer.textContent = `${minutes}:${seconds}`;
+}
+
+function startPomodoro() {
+  if (isRunning) return;
+  isRunning = true;
+  pauseBtn.disabled = false;
+  stopBtn.disabled = false;
+  workInput.disabled = true;
+  breakInput.disabled = true;
+  pomodoroStatus.textContent = isWorkTime ? 'Estado: Trabajando' : 'Estado: Descansando';
+  timeLeft = isWorkTime ? workInput.value * 60 : breakInput.value * 60;
+  updateTimerDisplay();
+
+  pomodoroInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      isWorkTime = !isWorkTime;
+      pomodoroStatus.textContent = isWorkTime ? 'Estado: Trabajando' : 'Estado: Descansando';
+      timeLeft = isWorkTime ? workInput.value * 60 : breakInput.value * 60;
+      updateTimerDisplay();
+    }
+  }, 1000);
+}
+
+function pausePomodoro() {
+  if (!isRunning) return;
+  isRunning = false;
+  clearInterval(pomodoroInterval);
+  pauseBtn.disabled = true;
+  pomodoroStatus.textContent += ' (Pausado)';
+}
+
+function stopPomodoro() {
+  isRunning = false;
+  clearInterval(pomodoroInterval);
+  pauseBtn.disabled = true;
+  stopBtn.disabled = true;
+  workInput.disabled = false;
+  breakInput.disabled = false;
+  isWorkTime = true;
+  timeLeft = 0;
+  pomodoroTimer.textContent = '25:00';
+  pomodoroStatus.textContent = 'Estado: Listo';
+}
+
+startBtn.addEventListener('click', startPomodoro);
+pauseBtn.addEventListener('click', pausePomodoro);
+stopBtn.addEventListener('click', stopPomodoro);
+
+// ================= Conversor =================
+const conversionType = document.getElementById('conversionType');
+const inputValue = document.getElementById('inputValue');
+const fromUnit = document.getElementById('fromUnit');
+const toUnit = document.getElementById('toUnit');
+const convertBtn = document.getElementById('convertBtn');
+const conversionResult = document.getElementById('conversionResult');
+
+const units = {
+  length: {
+    m: 1,
+    km: 1000,
+    cm: 0.01,
+    mm: 0.001,
+    inch: 0.0254,
+    ft: 0.3048,
+    yd: 0.9144,
+    mile: 1609.34,
+  },
+  weight: {
+    g: 1,
+    kg: 1000,
+    mg: 0.001,
+    lb: 453.592,
+    oz: 28.3495,
+  },
+  temperature: {
+    C: 'C',
+    F: 'F',
+    K: 'K',
+  }
+};
+
+function populateUnits(type) {
+  fromUnit.innerHTML = '';
+  toUnit.innerHTML = '';
+  if (type === 'temperature') {
+    ['C', 'F', 'K'].forEach(u => {
+      const optionFrom = document.createElement('option');
+      optionFrom.value = u;
+      optionFrom.textContent = u;
+      fromUnit.appendChild(optionFrom);
+
+      const optionTo = document.createElement('option');
+      optionTo.value = u;
+      optionTo.textContent = u;
+      toUnit.appendChild(optionTo);
+    });
+  } else {
+    Object.keys(units[type]).forEach(u => {
+      const optionFrom = document.createElement('option');
+      optionFrom.value = u;
+      optionFrom.textContent = u;
+      fromUnit.appendChild(optionFrom);
+
+      const optionTo = document.createElement('option');
+      optionTo.value = u;
+      optionTo.textContent = u;
+      toUnit.appendChild(optionTo);
+    });
+  }
+}
+
+function convertTemperature(value, from, to) {
+  if (from === to) return value;
+  let celsius;
+  switch(from) {
+    case 'C': celsius = value; break;
+    case 'F': celsius = (value - 32) * 5/9; break;
+    case 'K': celsius = value - 273.15; break;
+  }
+  switch(to) {
+    case 'C': return celsius;
+    case 'F': return celsius * 9/5 + 32;
+    case 'K': return celsius + 273.15;
+  }
+}
+
+function convertUnits() {
+  const type = conversionType.value;
+  const val = parseFloat(inputValue.value);
+  const from = fromUnit.value;
+  const to = toUnit.value;
+  if (isNaN(val)) {
+    conversionResult.textContent = 'Introduce un valor válido.';
+    return;
+  }
+  if (type === 'temperature') {
+    const result = convertTemperature(val, from, to);
+    conversionResult.textContent = `${val} ${from} = ${result.toFixed(2)} ${to}`;
+  } else {
+    const base = units[type][from];
+    const target = units[type][to];
+    const result = val * base / target;
+    conversionResult.textContent = `${val} ${from} = ${result.toFixed(4)} ${to}`;
+  }
+}
+
+conversionType.addEventListener('change', () => {
+  populateUnits(conversionType.value);
+  conversionResult.textContent = '';
+  inputValue.value = '';
+});
+convertBtn.addEventListener('click', convertUnits);
+populateUnits(conversionType.value);
+
+// ================= Agenda =================
+const agendaForm = document.getElementById('agendaForm');
+const agendaTask = document.getElementById('agendaTask');
+const taskList = document.getElementById('taskList');
+
+function loadTasks() {
+  const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+  taskList.innerHTML = '';
+  tasks.forEach(task => {
+    const li = document.createElement('li');
+    li.textContent = task;
+    li.addEventListener('click', () => {
+      deleteTask(task);
+    });
+    taskList.appendChild(li);
+  });
+}
+
+function saveTask(task) {
+  const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+  tasks.push(task);
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+  loadTasks();
+}
+
+function deleteTask(task) {
+  let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+  tasks = tasks.filter(t => t !== task);
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+  loadTasks();
+}
+
+agendaForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const task = agendaTask.value.trim();
+  if (task) {
+    saveTask(task);
+    agendaTask.value = '';
+  }
+});
+
+loadTasks();
+
+// ================= Resumidor PDF =================
+
+function simpleSummarize(text, level = 'medium') {
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  let count;
+  switch (level) {
+    case 'short': count = 2; break;
+    case 'medium': count = 5; break;
+    case 'long': count = 10; break;
+    default: count = 5;
+  }
+  return sentences.slice(0, count).join(' ').trim();
+}
+
+async function extractTextFromPDF(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const strings = content.items.map(item => item.str);
+    fullText += strings.join(' ') + ' ';
+  }
+  return fullText;
+}
+
+// Drag & drop functionality
+const uploadArea = document.getElementById('pdfUploadArea');
+const fileInput = document.getElementById('pdfFileInput');
+const summarizeBtn = document.getElementById('summarizeBtn');
+const summaryText = document.getElementById('summaryText');
+
+uploadArea.addEventListener('click', () => fileInput.click());
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadArea.style.border = '2px dashed #666';
+});
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.style.border = '';
+});
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.style.border = '';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') {
+    fileInput.files = e.dataTransfer.files;
+  } else {
+    alert('Solo se permiten archivos PDF.');
+  }
+});
+
+summarizeBtn.addEventListener('click', async () => {
+  const file = fileInput.files[0];
+  if (!file || file.type !== 'application/pdf') {
+    summaryText.textContent = 'Por favor sube un archivo PDF válido.';
+    return;
+  }
+
+  summaryText.textContent = 'Procesando resumen...';
+
+  try {
+    const text = await extractTextFromPDF(file);
+    const level = document.getElementById('summaryLength').value;
+    const summary = simpleSummarize(text, level);
+    summaryText.textContent = summary || 'No se pudo generar un resumen.';
+  } catch (error) {
+    summaryText.textContent = 'Error procesando el PDF: ' + error.message;
+  }
+});
+</script>
+</body>
+</html>
